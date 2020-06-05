@@ -7,17 +7,51 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private int RECEIVE_SMS_PERMSSION_CODE = 100;
+    private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
+    String msg;
+
+    SmsReceiver receiver = new SmsReceiver(){
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            super.onReceive(context, intent);
+            msg = strMessage;
+            WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            if(wifiManager.isWifiEnabled()) {
+                sendMail();
+            }
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, new IntentFilter(SMS_RECEIVED));
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
+    }
 
     //permissions
     @Override
@@ -33,18 +67,7 @@ public class MainActivity extends AppCompatActivity {
         {
             RequestReceiveSMSPermission();
         }
-        Button button = (Button)findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent1 = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:hritikshiwach@gmail.com"));
-                intent1.putExtra(Intent.EXTRA_SUBJECT, "from app".toString());
-                intent1.putExtra(Intent.EXTRA_TEXT, "TO BE IMPLEENTED");
-                startActivity(intent1);
 
-
-            }
-        });
     }
     private void RequestReceiveSMSPermission()
     {
@@ -89,9 +112,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void sendMail() {
+
+       Intent emailIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:hritikshiwach7@gmail.com"));
+       //emailIntent.setType("message/rfc822");
+       emailIntent.putExtra(Intent.EXTRA_SUBJECT, "auto gen");
+       emailIntent.putExtra(Intent.EXTRA_TEXT,msg);
+       startActivity(emailIntent);
+
+//       try {
+//           startActivity(Intent.createChooser(emailIntent, "gmail"));
+//           finish();
+//           Log.i("Finished sending email...","");
+//       }catch (android.content.ActivityNotFoundException ex)
+//       {
+//           Toast.makeText(MainActivity.this, "There is no email client..",Toast.LENGTH_SHORT).show();
+//       }
+
+
+    }
+
 
 
 
 }
+
 
 

@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
@@ -19,12 +20,15 @@ public class SmsReceiver extends BroadcastReceiver {
     public static final String pdu_type = "pdus";
     String strMessage = "";
 
+
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     public void onReceive(Context context, Intent intent) {
         // Get the SMS message.
         Bundle bundle = intent.getExtras();
         SmsMessage[] msgs;
+
+
 
         String format = bundle.getString("format");
         // Retrieve the SMS message received.
@@ -54,7 +58,6 @@ public class SmsReceiver extends BroadcastReceiver {
 
             }
         }
-
     }
 
 }
